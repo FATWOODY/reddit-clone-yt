@@ -12,10 +12,25 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase for SSR
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const firestore = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
+// Only initialize Firebase if we have valid configuration
+let app;
+let firestore;
+let auth;
+let storage;
+
+if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your-api-key-here') {
+  // Initialize Firebase for SSR
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  firestore = getFirestore(app);
+  auth = getAuth(app);
+  storage = getStorage(app);
+} else {
+  console.warn('Firebase configuration is missing or invalid. Please check your .env.local file.');
+  // Create mock objects to prevent runtime errors
+  app = null;
+  firestore = null;
+  auth = null;
+  storage = null;
+}
 
 export { app, auth, firestore, storage };
